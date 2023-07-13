@@ -18,6 +18,7 @@ app.use(cors(corsOrigin));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use('/uploads', express.static('uploads'));
 
 // connect to database
 const DB = process.env.MONGO_URL || "test";

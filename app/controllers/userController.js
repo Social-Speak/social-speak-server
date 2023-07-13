@@ -35,12 +35,18 @@ exports.register = async (req, res) => {
         .status(400)
         .json({ error: "User with the provided email already exists" });
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
       username,
       email,
       password: hashedPassword,
     });
+
+    if (req.file) {
+      newUser.avatar = req.file.path;
+    }
+
     const savedUser = await newUser.save();
     res.status(201).json(savedUser);
   } catch (error) {
@@ -119,17 +125,17 @@ exports.searchUser = async (req, res) => {
   try {
     if (token) {
       const input = req.params.username.toLowerCase();
-      const users = await User.find({ username: { $regex: "^" + input } });
+      const users = await User.find({ username: { $regex: input } });
 
       const userId = req.params.userId; // User ID yang sedang melakukan pencarian
-
-      const usernames = users.map((user) => ({
+      const data = users.slice(0, 5);
+      const result = data.map((user) => ({
         username: user.username,
         email: user.email,
         isFollowed: user.following.includes(userId), // Menambahkan flag isFollowed berdasarkan pengguna yang sedang mencari
       }));
 
-      res.json(usernames);
+      res.json(result);
     } else {
       res.status(401).json({ message: "Invalid token" });
     }

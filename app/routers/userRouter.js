@@ -1,8 +1,9 @@
 const express = require("express");
-const user = require("../controllers/userController");
 const router = express.Router();
+const user = require("../controllers/userController");
+const upload = require("../middleware/upload");
 
-router.post("/register", user.register)
+router.post("/register", upload.single('avatar'), user.register)
 router.post("/login", user.login)
 router.post("/oauth", user.oauth)
 router.post("/search/:username/:userId", user.searchUser)
