@@ -14,6 +14,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  info: {
+    type: String,
+  },
   following: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -22,8 +25,7 @@ const userSchema = new mongoose.Schema({
   ],
   avatar: {
     type: String,
-    required: true,
-  }
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);

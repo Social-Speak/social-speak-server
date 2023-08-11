@@ -47,8 +47,8 @@ exports.register = async (req, res) => {
       newUser.avatar = req.file.path;
     }
 
-    const savedUser = await newUser.save();
-    res.status(201).json(savedUser);
+    await newUser.save();
+    res.status(201).json({ message: "Success create account" });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
@@ -76,6 +76,7 @@ exports.login = async (req, res) => {
       email: user.email,
       password: user.password,
       token: generateLogToken(user),
+      avatar: user.avatar,
     });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
@@ -104,6 +105,11 @@ exports.oauth = async (req, res) => {
       email,
       password: hashedPassword,
     });
+
+    if (req.file) {
+      newUser.avatar = req.file.path;
+    }
+
     const savedUser = await newUser.save();
     res.status(201).json({
       id: savedUser._id,
@@ -111,6 +117,7 @@ exports.oauth = async (req, res) => {
       email: savedUser.email,
       password: savedUser.password,
       token: generateLogToken(savedUser),
+      avatar: savedUser.avatar,
     });
   } catch (error) {
     res
@@ -133,6 +140,7 @@ exports.searchUser = async (req, res) => {
         username: user.username,
         email: user.email,
         isFollowed: user.following.includes(userId), // Menambahkan flag isFollowed berdasarkan pengguna yang sedang mencari
+        avatar: user.avatar,
       }));
 
       res.json(result);
@@ -171,7 +179,7 @@ exports.followUser = async (req, res) => {
     console.error(error);
     res
       .status(500)
-      .json({ message: "Terjadi kesalahan saat mengikuti pengguna" });
+      .json({ message: "Internal Server Error" });
   }
 };
 
@@ -229,7 +237,11 @@ exports.getUserConnections = async (req, res) => {
         "username email"
       );
 
-      res.status(200).json({ followers, following: user.following });
+      res.status(200).json({
+        followers,
+        following: user.following,
+        avatar: user.avatar,
+      });
     } else {
       res.status(401).json({ message: "Invalid token" });
     }
